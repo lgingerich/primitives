@@ -14,7 +14,7 @@ This repo is intentionally "minimal to no AI coding":
 - keep APIs small and tests simple
 - increase complexity incrementally
 
-## Projects
+## Potential Projects
 
 - `bloom-filter`
 - `block-cache`
@@ -24,15 +24,15 @@ This repo is intentionally "minimal to no AI coding":
 - `ring-buffer`
 - `thread-pool`
 - `wal`
+- `b-tree`
 
 ## Quick start
 
-Each primitive is its own self-contained project. Enter a directory and run that project locally.
+All primitives are managed from the repo root with a single Cargo workspace manifest.
 
 Example (Rust project):
 
 ```bash
-cd bloom-filter
-cargo test
+cargo test -p bloom-filter
 ```
 
