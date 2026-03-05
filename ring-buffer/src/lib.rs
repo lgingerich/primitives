@@ -58,10 +58,57 @@ impl<T> RingBuffer<T> {
 }
 
 
+#[cfg(test)]
+mod tests {
+    use super::RingBuffer;
 
+    #[test]
+    fn new_zero_capacity_returns_error() {
+        let rb: Result<RingBuffer<i32>, _> = RingBuffer::new(0);
+        assert!(rb.is_err());
+    }
 
+    #[test]
+    fn push_then_pop_single_value() {
+        let mut rb = RingBuffer::new(2).unwrap();
 
-// assert!(head < size)
-// assert!(tail < size)
-// assert!(len(buf) >= 0)
-// assert!(len(buf) <= size)
+        assert_eq!(rb.push(42), Ok(()));
+        assert_eq!(rb.pop(), Some(42));
+        assert_eq!(rb.pop(), None);
+    }
+
+    #[test]
+    fn push_full_returns_err_with_value() {
+        let mut rb = RingBuffer::new(2).unwrap();
+
+        assert_eq!(rb.push(1), Ok(()));
+        assert_eq!(rb.push(2), Ok(()));
+        assert_eq!(rb.push(3), Err(3));
+    }
+
+    #[test]
+    fn pop_empty_returns_none() {
+        let mut rb: RingBuffer<i32> = RingBuffer::new(3).unwrap();
+        assert_eq!(rb.pop(), None);
+    }
+
+    #[test]
+    fn wraparound_preserves_fifo_order() {
+        let mut rb = RingBuffer::new(3).unwrap();
+
+        assert_eq!(rb.push(10), Ok(()));
+        assert_eq!(rb.push(20), Ok(()));
+        assert_eq!(rb.push(30), Ok(()));
+
+        assert_eq!(rb.pop(), Some(10));
+        assert_eq!(rb.pop(), Some(20));
+
+        assert_eq!(rb.push(40), Ok(()));
+        assert_eq!(rb.push(50), Ok(()));
+
+        assert_eq!(rb.pop(), Some(30));
+        assert_eq!(rb.pop(), Some(40));
+        assert_eq!(rb.pop(), Some(50));
+        assert_eq!(rb.pop(), None);
+    }
+}
