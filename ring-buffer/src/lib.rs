@@ -55,6 +55,29 @@ impl<T> RingBuffer<T> {
 
         out
     }
+
+    pub fn len(&self) -> usize {
+        self.size
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.buf.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.size == 0
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.size == self.buf.len()
+    }
+
+    pub fn clear(&mut self) {
+        self.buf.iter_mut().for_each(|slot| *slot = None);
+        self.head = 0;
+        self.tail = 0;
+        self.size = 0;
+    }
 }
 
 
