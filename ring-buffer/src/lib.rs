@@ -19,14 +19,25 @@ impl<T> RingBuffer<T> {
 
     pub fn push(&mut self, val: T) -> Result<(), T> {
         if self.size == self.buf.len() {
-            return Err(val) // error when ring buffer is full
+            return Err(val); // error when ring buffer is full
         }
 
-        self.push(val)
+        self.buf[self.tail] = Some(val);
+        self.tail = (self.tail + 1) % self.buf.len();
+        self.size += 1;
+        // assert!(head != tail)
+
+        Ok(())
     }
 
-    pub fn pop(&mut self) -> Self {
-
+    pub fn pop(&mut self) -> Option<T> {
+        if self.size == 0 {
+            return None; // empty, nothing to pop
+        }
+        let out = self.buf[self.head].take();
+        self.head = (self.head + 1) % self.buf.len();
+        self.size -= 1;
+        out
     }
 }
 
