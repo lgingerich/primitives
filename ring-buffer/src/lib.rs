@@ -5,8 +5,6 @@ pub struct RingBuffer<T> {
     size: usize,
 }
 
-
-
 impl<T> RingBuffer<T> {
     pub fn new(capacity: usize) -> Result<Self, &'static str> {
         if capacity == 0 {
@@ -22,49 +20,49 @@ impl<T> RingBuffer<T> {
     }
 
     pub fn push(&mut self, val: T) -> Result<(), T> {
-        debug_assert!(self.tail < self.buf.len(), "tail out of bounds" );
-        debug_assert!(self.size <= self.buf.len(), "size exceeds capacity");
+        debug_assert!(self.tail < self.capacity(), "tail out of bounds" );
+        debug_assert!(self.size <= self.capacity(), "size exceeds capacity");
 
-        if self.size == self.buf.len() {
+        if self.is_full() {
             return Err(val); // error when ring buffer is full
         }
 
         self.buf[self.tail] = Some(val);
-        self.tail = (self.tail + 1) % self.buf.len();
+        self.tail = (self.tail + 1) % self.capacity();
         self.size += 1;
         
-        debug_assert!(self.tail < self.buf.len(), "tail out of bounds" );
-        debug_assert!(self.size <= self.buf.len(), "size exceeds capacity");
+        debug_assert!(self.tail < self.capacity(), "tail out of bounds" );
+        debug_assert!(self.size <= self.capacity(), "size exceeds capacity");
 
         Ok(())
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        debug_assert!(self.head < self.buf.len(), "head out of bounds" );
-        debug_assert!(self.size <= self.buf.len(), "size exceeds capacity");
+        debug_assert!(self.head < self.capacity(), "head out of bounds" );
+        debug_assert!(self.size <= self.capacity(), "size exceeds capacity");
         
-        if self.size == 0 {
+        if self.is_empty() {
             return None; // empty, nothing to pop
         }
         let out = self.buf[self.head].take();
-        self.head = (self.head + 1) % self.buf.len();
+        self.head = (self.head + 1) % self.capacity();
         self.size -= 1;
 
-        debug_assert!(self.head < self.buf.len(), "head out of bounds" );
-        debug_assert!(self.size <= self.buf.len(), "size exceeds capacity");
+        debug_assert!(self.head < self.capacity(), "head out of bounds" );
+        debug_assert!(self.size <= self.capacity(), "size exceeds capacity");
 
         out
     }
 
     pub fn peek(&self) -> Option<&T> {
-        if self.size == 0 {
+        if self.is_empty() {
             return None; // empty, nothing to peek
         }
         self.buf[self.head].as_ref()
     }
 
     pub fn peek_mut(&mut self) -> Option<&mut T> {
-        if self.size == 0 {
+        if self.is_empty() {
             return None; // empty, nothing to peek
         }
         self.buf[self.head].as_mut()
