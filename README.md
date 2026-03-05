@@ -16,15 +16,15 @@ This repo is intentionally "minimal to no AI coding":
 
 ## Potential Projects
 
+- `ring-buffer`
+- `lru-cache`
 - `bloom-filter`
 - `block-cache`
-- `kv-store`
-- `lru-cache`
-- `radix-sort`
-- `ring-buffer`
 - `thread-pool`
+- `kv-store`
 - `wal`
 - `b-tree`
+- `radix-sort`
 
 ## Quick start
 

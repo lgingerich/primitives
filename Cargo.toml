@@ -1,5 +1,5 @@
 [workspace]
-members = ["bloom-filter"]
+members = ["bloom-filter", "ring-buffer"]
 resolver = "3"
 
 [workspace.package]

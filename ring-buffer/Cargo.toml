@@ -1,0 +1,6 @@
+[package]
+name = "ring-buffer"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
