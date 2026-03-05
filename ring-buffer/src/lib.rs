@@ -56,6 +56,20 @@ impl<T> RingBuffer<T> {
         out
     }
 
+    pub fn peek(&self) -> Option<&T> {
+        if self.size == 0 {
+            return None; // empty, nothing to peek
+        }
+        self.buf[self.head].as_ref()
+    }
+
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
+        if self.size == 0 {
+            return None; // empty, nothing to peek
+        }
+        self.buf[self.head].as_mut()
+    }
+
     pub fn len(&self) -> usize {
         self.size
     }
