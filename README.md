@@ -1,38 +1,66 @@
 # primitives
 
-A collection of small, focused systems/data-structure primitives built for learning and experimentation.
+`primitives` is a Rust workspace for building small systems components for learning and experimentation.
 
-## Goal
+The goal is to learn core storage and systems ideas by implementing focused primitives by hand and growing them incrementally over time.
 
-Build many tiny projects that each teach one core idea, with real hands-on practice.
+## Approach
 
-This repo is intentionally "minimal to no AI coding":
+- implement core ideas directly
+- keep APIs small and explicit
+- prioritize correctness and understanding over speed
+- add complexity incrementally
+
+AI usage is intentionally limited:
 
 - write the code myself
-- use AI only for learning (concepts, debugging guidance, explanations)
-- prioritize correctness first
-- keep APIs small and tests simple
-- increase complexity incrementally
+- use AI primarily for learning, explanation, and debugging help
+- avoid outsourcing the core implementation work
+- keep the feedback loop grounded in direct understanding
 
-## Potential Projects
+## Current workspace
 
-- `ring-buffer`
-- `lru-cache`
-- `bloom-filter`
-- `block-cache`
-- `thread-pool`
-- `kv-store`
-- `wal`
-- `b-tree`
-- `radix-sort`
+Project Ideas:
+
+Core data primitives:
+- [X] `ring-buffer`
+- [ ] `bitmap`
+- [ ] `bloom-filter`
+- [ ] `heap`
+- [ ] `arena`
+- [ ] `lru-cache`
+- [ ] `hyperloglog`
+- [ ] `skiplist`
+- [ ] `b-tree`
+
+Storage engine primitives:
+- [ ] `wal`
+- [ ] `segment-log`
+- [ ] `memtable`
+- [ ] `sstable`
+- [ ] `block-cache`
+- [ ] `kv-store`
+
+ML primitives:
+- [ ] `tensor`
+- [ ] `tokenizer`
+- [ ] `sampler`
+- [ ] `kv-cache`
+- [ ] `quantization`
+- [ ] `matmul-kernel`
 
 ## Quick start
 
-All primitives are managed from the repo root with a single Cargo workspace manifest.
+All crates are managed from the workspace root.
 
-Example (Rust project):
+Run tests for a single crate:
 
 ```bash
-cargo test -p bloom-filter
+cargo test -p ring-buffer
 ```
 
+Run all workspace tests:
+
+```bash
+cargo test
+```
