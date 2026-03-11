@@ -1,5 +1,5 @@
 [workspace]
-members = ["bloom-filter", "ring-buffer"]
+members = ["crates/bloom-filter", "crates/ring-buffer", "crates/vector"]
 resolver = "3"
 
 [workspace.package]

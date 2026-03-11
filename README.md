@@ -24,14 +24,17 @@ Project Ideas:
 
 Core data primitives:
 - [X] `ring-buffer`
+- [ ] `vector`
+- [ ] `heap`
+- [ ] `hashmap`
+- [ ] `skiplist`
+- [ ] `b-tree`
+- [ ] `lsm-tree`
 - [ ] `bitmap`
 - [ ] `bloom-filter`
-- [ ] `heap`
 - [ ] `arena`
 - [ ] `lru-cache`
 - [ ] `hyperloglog`
-- [ ] `skiplist`
-- [ ] `b-tree`
 
 Storage engine primitives:
 - [ ] `wal`
