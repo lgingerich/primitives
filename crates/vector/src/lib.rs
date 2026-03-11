@@ -25,20 +25,37 @@ impl<T> MyVec<T> {
         Ok(())
     }
 
-    // // pop removes last element
-    // pub fn pop() -> {
+    // pop removes last element
+    pub fn pop(&mut self) -> Option<T> {
+        if self.length == 0 {
+            return None;
+        }
 
-    // }
+        self.length -= 1;
+        let out = self.storage[self.length].take();
+
+        out
+    }
 
     // // get = return value at index
-    // pub fn get() -> {
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index >= self.length {
+            return None;
+        }
 
-    // }
+        self.storage[index].as_ref()
+    }
 
     // // set = set value at index
-    // pub fn set() -> {
+    pub fn set(&mut self, index: usize, val: T) -> Result<(), T> {
+        if index >= self.length {
+            return Err(val);
+        }
 
-    // }
+        self.storage[index] = Some(val);
+
+        Ok(())
+    }
 
     // grow only full vec's (length == capacity)
     fn grow(&mut self) {
@@ -65,12 +82,7 @@ impl<T> MyVec<T> {
         self.storage = new_storage;
     }
 
-    // pub fn len(self) -> usize {
-
-    // }
-
-    // pub fn is_empty(self) -> bool {
-
-    // }
-
+    pub fn is_empty(self) -> bool {
+        self.length == 0
+    }
 }
