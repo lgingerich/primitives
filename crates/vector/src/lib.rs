@@ -13,6 +13,17 @@ impl<T> MyVec<T> {
         }
     }
 
+    pub fn with_capacity(capacity: usize) -> MyVec<T> {
+        MyVec {
+            storage: std::iter::repeat_with(|| None)
+                .take(capacity)
+                .collect::<std::vec::Vec<_>>()
+                .into_boxed_slice(),
+            length: 0,
+            capacity
+        }
+    }
+
     // push inserts at last element + 1
     pub fn push(&mut self, val: T) -> Result<(), T> {
         if self.length == self.capacity {
