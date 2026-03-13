@@ -1,5 +1,5 @@
 pub struct MyVec<T> {
-    storage: Box<[Option<T>]>, // uses to avoid manual memory management for now
+    buf: std::ptr::NonNull<T>,
     length: usize,
     capacity: usize
 }
@@ -7,18 +7,23 @@ pub struct MyVec<T> {
 impl<T> MyVec<T> {
     pub fn new() -> MyVec<T> {
         MyVec {
-            storage: Box::new([]),
+            buf: std::ptr::NonNull::dangling(),
             length: 0,
             capacity: 0
         }
     }
 
     pub fn with_capacity(capacity: usize) -> MyVec<T> {
+        let buf = if capacity == 0 {
+            std::ptr::NonNull::dangling()
+        } else {
+            let layout = std::alloc::Layout::array::<T>(capacity).unwrap();
+            let raw = unsafe { std::alloc::alloc(layout) } as *mut T;
+            std::ptr::NonNull::new(raw).unwrap_or_else(|| std::alloc::handle_alloc_error(layout))
+        };
+
         MyVec {
-            storage: std::iter::repeat_with(|| None)
-                .take(capacity)
-                .collect::<std::vec::Vec<_>>()
-                .into_boxed_slice(),
+            buf,
             length: 0,
             capacity
         }
@@ -30,7 +35,11 @@ impl<T> MyVec<T> {
             self.grow();
         }
 
-        self.storage[self.length] = Some(val);
+        unsafe {
+            std::ptr::write(self.buf.add(self.length).as_mut(), val);
+        }
+
+        // self.storage[self.length] = Some(val);
         self.length += 1;
 
         Ok(())
@@ -43,7 +52,11 @@ impl<T> MyVec<T> {
         }
 
         self.length -= 1;
-        let out = self.storage[self.length].take();
+        // let out = self.storage[self.length].take();
+
+        unsafe {
+            let out = std::ptr::read(self.buf.add(self.length).as_mut());
+        }
 
         out
     }
