@@ -1,112 +1,120 @@
 pub struct MyVec<T> {
     buf: std::ptr::NonNull<T>,
-    length: usize,
-    capacity: usize
+    len: usize,
+    cap: usize,
 }
 
+// Constructor invariants (`new` and `with_capacity`):
+// - `len == 0` and `len <= cap`.
+// - `buf` is always non-null.
+// - If `cap == 0`, `buf` may be dangling and must not be dereferenced.
+// - If `cap > 0`, `buf` points to an allocation valid for `cap` values of `T`.
+// - No elements are initialized while `len == 0`.
 impl<T> MyVec<T> {
     pub fn new() -> MyVec<T> {
         MyVec {
             buf: std::ptr::NonNull::dangling(),
-            length: 0,
-            capacity: 0
+            len: 0,
+            cap: 0,
         }
     }
 
-    pub fn with_capacity(capacity: usize) -> MyVec<T> {
-        let buf = if capacity == 0 {
+    pub fn with_capacity(cap: usize) -> MyVec<T> {
+        let buf = if cap == 0 {
             std::ptr::NonNull::dangling()
         } else {
-            let layout = std::alloc::Layout::array::<T>(capacity).unwrap();
+            let layout = match std::alloc::Layout::array::<T>(cap) {
+                Ok(layout) => layout,
+                Err(_) => panic!("capacity overflow in MyVec::with_capacity",),
+            };
             let raw = unsafe { std::alloc::alloc(layout) } as *mut T;
             std::ptr::NonNull::new(raw).unwrap_or_else(|| std::alloc::handle_alloc_error(layout))
         };
 
         MyVec {
             buf,
-            length: 0,
-            capacity
+            len: 0,
+            cap,
         }
     }
 
     // push inserts at last element + 1
     pub fn push(&mut self, val: T) -> Result<(), T> {
-        if self.length == self.capacity {
-            self.grow();
+        if self.len == self.cap {
+            self.grow()?;
         }
 
         unsafe {
-            std::ptr::write(self.buf.add(self.length).as_mut(), val);
+            std::ptr::write(self.buf.add(self.len).as_ptr(), val);
         }
 
-        // self.storage[self.length] = Some(val);
-        self.length += 1;
+        self.len += 1;
 
         Ok(())
     }
 
     // pop removes last element
     pub fn pop(&mut self) -> Option<T> {
-        if self.length == 0 {
+        if self.len == 0 {
             return None;
         }
 
-        self.length -= 1;
-        // let out = self.storage[self.length].take();
+        self.len -= 1;
+        let out = unsafe { std::ptr::read(self.buf.add(self.len).as_ptr()) };
 
-        unsafe {
-            let out = std::ptr::read(self.buf.add(self.length).as_mut());
-        }
-
-        out
+        Some(out)
     }
 
-    // // get = return value at index
+    // get = return value at index
     pub fn get(&self, index: usize) -> Option<&T> {
-        if index >= self.length {
+        if index >= self.len {
             return None;
         }
 
-        self.storage[index].as_ref()
+        Some(unsafe { &*self.buf.as_ptr().add(index) })
     }
 
-    // // set = set value at index
+    // set = set value at index
     pub fn set(&mut self, index: usize, val: T) -> Result<(), T> {
-        if index >= self.length {
+        if index >= self.len {
             return Err(val);
         }
 
-        self.storage[index] = Some(val);
+        let _old = unsafe { std::ptr::replace(self.buf.as_ptr().add(index), val) };
 
         Ok(())
     }
 
-    // grow only full vec's (length == capacity)
+    // grow only full vec's (len == cap)
     fn grow(&mut self) {
         // calculate new capacity
-        let new_capacity = if self.capacity == 0 {
+        let new_cap = if self.cap == 0 {
             1
         } else {
-            self.capacity * 2
+            self.cap * 2
         };
 
-        // build new storage
-        let mut new_storage: Box<[Option<T>]> =
-            std::iter::repeat_with(|| None)
-                .take(new_capacity)
-                .collect::<std::vec::Vec<_>>()
-                .into_boxed_slice();
+        let new_layout = std::alloc::Layout::array::<T>(new_cap).unwrap_or_else(|_| panic!("capacity overflow in MyVec::grow"));
 
-        // move data over
-        for i in 0..self.length {
-            new_storage[i] = self.storage[i].take();
-        }
-        
-        self.capacity = new_capacity;
-        self.storage = new_storage;
+        let new_raw = if self.cap == 0 {
+            // use alloc() on first allocation when capacity = 0
+            unsafe { std::alloc::alloc(new_layout) }
+        } else {
+            // for capacity > 0, we want to resize, so use realloc()
+            let old_layout = std::alloc::Layout::array::<T>(self.cap).unwrap_or_else(|_| panic!("capacity overflow in MyVec::grow"));
+
+            unsafe {
+                std::alloc::realloc(self.buf.as_ptr() as *mut u8, old_layout, new_layout.size())
+            }
+        } as *mut T;
+
+        let new_buf = std::ptr::NonNull::new(new_raw).unwrap_or_else(|| std::alloc::handle_alloc_error(new_layout));
+
+        self.buf = new_buf;
+        self.cap = new_cap;
     }
 
     pub fn is_empty(self) -> bool {
-        self.length == 0
+        self.len == 0
     }
 }
