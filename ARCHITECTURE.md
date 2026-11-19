@@ -20,4 +20,9 @@ Keep this file short (~1 page). Project-specific invariants live here; universal
 ## Forbidden Patterns / Dependencies
 - `unsafe` is confined to `crates/vector` (raw allocation and pointer reads/writes). Don't add it to other crates.
 - Tests are unit tests inside each crate's `src/lib.rs`; HEAD has no `tests/` directories.
-- The workspace root has no `[lints]` table at HEAD, so the strict-lint wording in `AGENTS.md` is not yet enforced here.
+
+## Agent Workflow
+
+- `README.md` says the author writes the core implementations by hand and uses AI for learning, explanation and debugging. Prefer explaining or reviewing over writing a primitive's implementation unless asked.
+- `crates/vector` intentionally uses `unsafe`, which the workspace's `unsafe_code = "deny"` lint rejects. Keep any `unsafe` documented with its invariants.
+- `crates/vector` and `crates/bloom-filter` may not pass clippy or build while in progress.

@@ -49,9 +49,3 @@ RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
 cargo test --doc
 cargo nextest run --all-targets --all-features --no-tests pass # or: cargo test --all-targets --all-features
 ```
-
-## Project-Specific
-
-- `README.md` says the author writes the core implementations by hand and uses AI for learning, explanation and debugging. Prefer explaining or reviewing over writing a primitive's implementation unless asked.
-- `crates/vector` intentionally uses `unsafe`; the template's "no `unsafe`" lint stance does not apply there until the workspace defines lints. Keep any `unsafe` documented with its invariants.
-- Verification: the workspace root has no `[lints]` table, so run the template checks per workspace; `crates/vector` and `crates/bloom-filter` may not pass clippy/build while in progress.
